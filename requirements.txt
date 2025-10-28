@@ -1,5 +1,1 @@
-# simple-blockchain-demo requirements
-hashlib
-datetime
-json
 streamlit
