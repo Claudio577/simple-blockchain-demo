@@ -1,5 +1,5 @@
+import streamlit as st
 import hashlib
-import json
 from datetime import datetime
 
 # ===== Classe do Bloco =====
@@ -39,19 +39,38 @@ class Blockchain:
                 return False
         return True
 
-# ===== Teste do Sistema =====
-bc = Blockchain()
-bc.add_block("Fornecedor enviou o lote 001")
-bc.add_block("Fabricante produziu o item com lote 001")
-bc.add_block("Varejista recebeu o item e colocou à venda")
 
-# Mostrar os blocos
-for bloco in bc.chain:
-    print(f"\nBloco {bloco.index}")
-    print(f"Data: {bloco.timestamp}")
-    print(f"Dados: {bloco.data}")
-    print(f"Hash: {bloco.hash[:20]}...")
-    print(f"Anterior: {bloco.previous_hash[:20]}...")
+# ===== INTERFACE STREAMLIT =====
+st.set_page_config(page_title="Blockchain Demo", page_icon="🧱", layout="wide")
+st.title("🧱 Simple Blockchain Demo")
+st.markdown("Simulação visual de uma **blockchain realista** — com blocos encadeados e verificação de integridade.")
 
-# Verificar se a cadeia é válida
-print("\n✅ Blockchain válida?", bc.is_chain_valid())
+# Inicializa a blockchain na sessão
+if "bc" not in st.session_state:
+    st.session_state.bc = Blockchain()
+
+# Entrada de dados
+st.subheader("📦 Adicionar novo bloco")
+novo_dado = st.text_input("Digite o conteúdo do novo bloco:")
+
+if st.button("Adicionar bloco"):
+    if novo_dado.strip():
+        st.session_state.bc.add_block(novo_dado)
+        st.success("✅ Bloco adicionado com sucesso!")
+    else:
+        st.warning("Digite algum dado antes de adicionar um bloco.")
+
+# Mostrar os blocos existentes
+st.subheader("🔗 Cadeia de Blocos")
+for bloco in st.session_state.bc.chain:
+    with st.expander(f"🧩 Bloco {bloco.index}"):
+        st.write(f"**Data/Hora:** {bloco.timestamp}")
+        st.write(f"**Dados:** {bloco.data}")
+        st.code(f"Hash: {bloco.hash}")
+        st.code(f"Anterior: {bloco.previous_hash}")
+
+# Validar integridade
+if st.session_state.bc.is_chain_valid():
+    st.success("✅ Blockchain válida e íntegra!")
+else:
+    st.error("⚠️ Blockchain comprometida!")
